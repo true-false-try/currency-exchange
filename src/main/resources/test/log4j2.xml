@@ -1,0 +1,38 @@
+<Configuration status="WARN" monitorInterval="30">
+    <Properties>
+        <Property name="LOG_PATTERN">%highlight{%d{DEFAULT} [%X{traceId}] %-5level %c{1.} - %msg%n}{STYLE=Logback}</Property>
+        <Property name="LOG_PATTERN_KAFKA">%d{DEFAULT} [%X{traceId}] %-5level %c{1.} - %msg%n</Property>
+        <Property name="KAFKA_BOOTSTRAP_SERVERS">${bundle:application:kafka-log.bootstrap.servers}</Property>
+    </Properties>
+    <Appenders>
+        <Console name="ConsoleAppender" target="SYSTEM_OUT" follow="true">
+            <PatternLayout pattern="${LOG_PATTERN}"/>
+        </Console>
+        <Kafka name="KafkaAppender" topic="Log_micro_currency-exchange" syncSend="false">
+            <PatternLayout pattern="${LOG_PATTERN_KAFKA}"/>
+            <Property name="bootstrap.servers">${KAFKA_BOOTSTRAP_SERVERS}</Property>
+        </Kafka>
+    </Appenders>
+    <Loggers>
+        <Logger name="com.npi.microservices.service.impl" level="debug" additivity="true">
+            <AppenderRef ref="ConsoleAppender"/>
+        </Logger>
+        <Logger name="com.npi.microservices.config.rest.interceptor.ClientHttpLoggingInterceptor" level="debug" additivity="true">
+            <AppenderRef ref="KafkaAppender"/>
+            <AppenderRef ref="ConsoleAppender"/>
+        </Logger>
+        <Logger name="com.npi.microservices.config.logging.HttpRequestLoggingFilter" level="debug" additivity="true">
+            <AppenderRef ref="KafkaAppender"/>
+            <AppenderRef ref="ConsoleAppender"/>
+        </Logger>
+        <Logger name="com.npi.microservices.handler.GlobalExceptionHandler" level="debug" additivity="true">
+            <AppenderRef ref="ConsoleAppender"/>
+        </Logger>
+        <Logger name="org.springframework.data" level="debug" additivity="true">
+            <AppenderRef ref="ConsoleAppender"/>
+        </Logger>
+        <Root level="info">
+            <AppenderRef ref="ConsoleAppender"/>
+        </Root>
+    </Loggers>
+</Configuration>
